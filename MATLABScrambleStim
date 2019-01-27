@@ -1,0 +1,14 @@
+img=imread('1.png');
+image(img)
+x=1:20:181;
+y=x;
+randImg=uint8(zeros(200,200,3));
+xRand=x(randperm(10));
+yRand=y(randperm(10));
+% imgRand=uint8(xRand, yRand, 3);
+for i=1:numel(xRand)
+    for j=1:numel(yRand)
+        randImg(xRand(i):xRand(i)+19,yRand(j):yRand(j)+19,:)=img(x(i):x(i)+19,y(j):y(j)+19,:);
+    end
+end
+imshow(randImg)

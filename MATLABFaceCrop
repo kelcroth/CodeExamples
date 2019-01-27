@@ -1,0 +1,18 @@
+imageDir = 'C:\Users\Kelly\Desktop\FaceStim'; %Toolbox - get image set
+im_Set = imageSet(imageDir); %get images within directory
+for k = 1:im_Set.Count %for loop = for each image in image set
+    baseFileName = sprintf('Face (%d).jpg', k); %find images named this template
+    fullFileName = fullfile(imageDir, baseFileName); %locate original folder
+    i = imread(fullFileName); %get specific image
+    A = rgb2gray(i); %convert each image to grayscale
+    NoseDetect = vision.CascadeObjectDetector('Nose','MergeThreshold',25); %find nose
+    BB=step(NoseDetect,i); %create bounding box around nose
+    b = [BB(2) + BB(4)/2 - 100, BB(1) + BB(3)/2]; %finds center of nose, subtracts 100 from y-axis to center to face
+    c = fix(b); %ellipse center point (y, x)
+    r_sq = [350, 500] .^ 2; %ellipse radii squared (y-axis, x-axis)
+    [X, Y] = meshgrid(1:size(A, 2), 1:size(A, 1)); %Create black mask
+    ellipse_mask = (r_sq(2) * (X - c(2)) .^ 2 + r_sq(1) * (Y - c(1)) .^ 2 <= prod(r_sq)); %create ellipse
+    A_cropped = A.*uint8(ellipse_mask); %apply mask
+    A_cropped(~ellipse_mask) = 255; %make mask white
+    imwrite(A_cropped, fullFileName); %write new file back to original folder
+end
